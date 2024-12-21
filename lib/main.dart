@@ -1,6 +1,7 @@
 import 'package:cockpit/config/configs.dart';
 import 'package:cockpit/config/constants.dart';
 import 'package:cockpit/firebase_options.dart';
+import 'package:cockpit/pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -29,6 +30,7 @@ class CockpitApp extends StatelessWidget {
     return MaterialApp(
       title: appTitle,
       theme: appTheme,
+      debugShowCheckedModeBanner: false,
       home: const LoginRedirect(),
     );
   }
@@ -43,7 +45,7 @@ class LoginRedirect extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return const Placeholder();
+          return const HomePage();
         }
         return const SignInScreen();
       },
