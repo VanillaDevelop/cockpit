@@ -1,7 +1,7 @@
 import 'package:cockpit/components/app_scaffold.dart';
 import 'package:cockpit/components/feature_card.dart';
 import 'package:cockpit/components/responsive_grid.dart';
-import 'package:cockpit/features/stream_of_consciousness.dart';
+import 'package:cockpit/features/stream_of_consciousness/stream_of_consciousness.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -32,8 +32,8 @@ class HomePage extends StatelessWidget {
           child: Text('Placeholder - Automation Buttons'),
         ),
         FeatureCard(
-          title: 'Placeholder',
-          child: Text('Placeholder'),
+          title: 'Finance Tracker',
+          child: Text('Placeholder - Finance Tracker'),
         ),
       ]),
     );
