@@ -1,34 +1,14 @@
 import 'package:cockpit/models/thought.dart';
-import 'package:cockpit/utils/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:cockpit/features/stream_of_consciousness/thought_card.dart';
 
-class ThoughtHistory extends StatefulWidget {
+class ThoughtHistory extends StatelessWidget {
+  final List<Thought> thoughts;
+
   const ThoughtHistory({
     super.key,
+    required this.thoughts,
   });
-
-  @override
-  State<ThoughtHistory> createState() => _ThoughtHistoryState();
-}
-
-class _ThoughtHistoryState extends State<ThoughtHistory> {
-  List<Thought> recentThoughts = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    getThoughts().then((thoughts) {
-      recentThoughts = thoughts;
-      recentThoughts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      setState(() {
-        recentThoughts = recentThoughts.length < 3
-            ? recentThoughts
-            : recentThoughts.sublist(0, 3);
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +35,9 @@ class _ThoughtHistoryState extends State<ThoughtHistory> {
           ),
         ),
         SizedBox(
-          height: 240,
-          child: recentThoughts.isNotEmpty
-              ? buildThoughtSummary(recentThoughts)
+          height: 310,
+          child: thoughts.isNotEmpty
+              ? buildThoughtSummary(thoughts)
               : buildEmptyThoughtPlaceholder(),
         )
       ],

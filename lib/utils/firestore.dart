@@ -15,13 +15,16 @@ Future<List<Thought>> getThoughts() async {
   return thoughts.docs.map((doc) => Thought.fromJson(doc.data())).toList();
 }
 
-Future<void> addThought(Thought thought) async {
+Future<bool> addThought(Thought thought) async {
   final userId = getUser().uid;
-  await _firestore
+  bool success = await _firestore
       .collection('users')
       .doc(userId)
       .collection('thoughts')
-      .add(thought.toJson());
+      .add(thought.toJson())
+      .then((value) => true)
+      .catchError((error) => false);
+  return success;
 }
 
 User getUser() {
