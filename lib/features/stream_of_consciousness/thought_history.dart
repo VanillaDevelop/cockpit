@@ -2,13 +2,46 @@ import 'package:cockpit/models/thought.dart';
 import 'package:flutter/material.dart';
 import 'package:cockpit/features/stream_of_consciousness/thought_card.dart';
 
-class ThoughtHistory extends StatelessWidget {
-  final List<Thought> thoughts;
-
+class ThoughtHistory extends StatefulWidget {
   const ThoughtHistory({
     super.key,
-    required this.thoughts,
   });
+
+  @override
+  ThoughtHistoryState createState() => ThoughtHistoryState();
+}
+
+class ThoughtHistoryState extends State<ThoughtHistory> {
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  //This is the list of thoughts that will be displayed in the UI
+  final List<Thought> _thoughts = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void addThought(Thought thought) {
+    //If list of thoughts is empty, set state so that the animated list displays
+    if (_thoughts.isEmpty) {
+      setState(() {});
+    }
+
+    //remove the oldest thought if the list is longer than 2
+    if (_thoughts.length > 2) {
+      _listKey.currentState?.removeItem(
+          0, (context, animation) => ThoughtCard(thought: _thoughts[0]),
+          duration: const Duration(milliseconds: 0));
+      // Remove the thought from the data source after animation starts
+      _thoughts.removeAt(0);
+    }
+
+    _thoughts.add(thought);
+    _listKey.currentState?.insertItem(
+      _thoughts.length - 1,
+      duration: const Duration(milliseconds: 600),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +69,8 @@ class ThoughtHistory extends StatelessWidget {
         ),
         SizedBox(
           height: 310,
-          child: thoughts.isNotEmpty
-              ? buildThoughtSummary(thoughts)
+          child: _thoughts.isNotEmpty
+              ? buildThoughtSummary()
               : buildEmptyThoughtPlaceholder(),
         )
       ],
@@ -55,12 +88,21 @@ class ThoughtHistory extends StatelessWidget {
     );
   }
 
-  Widget buildThoughtSummary(List<Thought> thoughts) {
-    return ListView.builder(
-      itemCount: thoughts.length,
-      itemBuilder: (context, index) {
-        return ThoughtCard(thought: thoughts[index]);
-      },
+  Widget buildThoughtSummary() {
+    return ClipRect(
+      child: AnimatedList(
+        key: _listKey,
+        initialItemCount: _thoughts.length,
+        itemBuilder: (context, index, animation) => SlideTransition(
+          position: Tween(
+            begin: const Offset(0.0, 1.0),
+            end: const Offset(0.0, 0.0),
+          ).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+          ),
+          child: ThoughtCard(thought: _thoughts[index]),
+        ),
+      ),
     );
   }
 }

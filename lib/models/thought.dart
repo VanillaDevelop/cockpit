@@ -21,6 +21,15 @@ class Thought {
     required this.type,
   });
 
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Thought && other.createdAt == createdAt;
+  }
+
+  @override
+  int get hashCode => createdAt.hashCode;
+
   factory Thought.fromJson(Map<String, dynamic> json) {
     return Thought._categorized(
       content: json['content'],

@@ -1,5 +1,6 @@
 import 'package:cockpit/models/thought.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ThoughtCard extends StatelessWidget {
   final Thought thought;
@@ -17,7 +18,7 @@ class ThoughtCard extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                thought.createdAt.toLocal().toString(),
+                DateFormat('dd.MM.yyyy hh:mm a').format(thought.createdAt),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),

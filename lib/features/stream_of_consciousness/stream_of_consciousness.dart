@@ -12,17 +12,18 @@ class StreamOfConsciousness extends StatefulWidget {
 }
 
 class _StreamOfConsciousnessState extends State<StreamOfConsciousness> {
-  List<Thought> recentThoughts = [];
+  final GlobalKey<ThoughtHistoryState> _thoughtHistoryKey =
+      GlobalKey<ThoughtHistoryState>();
 
   @override
   void initState() {
     super.initState();
 
     getThoughts().then((thoughts) {
-      recentThoughts = thoughts;
-      setState(() {
-        _cleanAndSortThoughts();
-      });
+      thoughts = _cleanAndSortThoughts(thoughts);
+      for (int i = thoughts.length - 1; i >= 0; i--) {
+        _thoughtHistoryKey.currentState?.addThought(thoughts[i]);
+      }
     });
   }
 
@@ -31,23 +32,19 @@ class _StreamOfConsciousnessState extends State<StreamOfConsciousness> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ThoughtHistory(thoughts: recentThoughts),
+        ThoughtHistory(key: _thoughtHistoryKey),
         ThoughtInput(onThoughtAdded: _onThoughtAdded),
       ],
     );
   }
 
-  void _cleanAndSortThoughts() {
-    recentThoughts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    recentThoughts = recentThoughts.length < 3
-        ? recentThoughts
-        : recentThoughts.sublist(0, 3);
+  List<Thought> _cleanAndSortThoughts(List<Thought> thoughts) {
+    thoughts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    thoughts = thoughts.length < 3 ? thoughts : thoughts.sublist(0, 3);
+    return thoughts;
   }
 
   void _onThoughtAdded(Thought thought) {
-    setState(() {
-      recentThoughts.add(thought);
-      _cleanAndSortThoughts();
-    });
+    _thoughtHistoryKey.currentState?.addThought(thought);
   }
 }
