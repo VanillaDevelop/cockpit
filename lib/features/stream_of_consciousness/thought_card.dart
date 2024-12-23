@@ -5,12 +5,17 @@ class ThoughtCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
+    return Card(
       child: Padding(
-        padding: EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(10.0),
         child: SizedBox(
           width: double.infinity,
-          child: Text('Thought'),
+          height: Theme.of(context).textTheme.bodyMedium!.fontSize! * 1.5 * 2,
+          child: const Text(
+            'Thought ThoughtThoughtThoughtThoughtThoughtThoughtThoughtThoughtThoughtThoughtThought',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ),
     );

@@ -10,13 +10,17 @@ class StreamOfConsciousness extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildThoughtHistory(context),
-        const SizedBox(height: 30),
         buildTextBox(),
-        const SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: () {},
-          child: const Text('Send Thought'),
+        Align(
+          alignment: Alignment.centerRight,
+          child: SizedBox(
+            child: ElevatedButton(
+              onPressed: () {},
+              child: const Text('Send Thought'),
+            ),
+          ),
         ),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -28,16 +32,33 @@ class StreamOfConsciousness extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            'Recent Thoughts',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Recent Thoughts',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.list_alt),
+                tooltip: 'View History',
+              ),
+            ],
           ),
         ),
-        const ThoughtCard(),
-        const ThoughtCard(),
-        const ThoughtCard(),
+        const SizedBox(
+          height: 240,
+          child: Column(
+            children: [
+              ThoughtCard(),
+              ThoughtCard(),
+              ThoughtCard(),
+            ],
+          ),
+        )
       ],
     );
   }
