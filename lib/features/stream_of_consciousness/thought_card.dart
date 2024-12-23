@@ -1,7 +1,10 @@
+import 'package:cockpit/models/thought.dart';
 import 'package:flutter/material.dart';
 
 class ThoughtCard extends StatelessWidget {
-  const ThoughtCard({super.key});
+  final Thought thought;
+
+  const ThoughtCard({super.key, required this.thought});
 
   @override
   Widget build(BuildContext context) {
@@ -11,8 +14,8 @@ class ThoughtCard extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           height: Theme.of(context).textTheme.bodyMedium!.fontSize! * 1.5 * 2,
-          child: const Text(
-            'Thought ThoughtThoughtThoughtThoughtThoughtThoughtThoughtThoughtThoughtThoughtThought',
+          child: Text(
+            thought.content,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
