@@ -1,10 +1,28 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class AppScaffold extends StatelessWidget {
+class AppScaffold extends StatefulWidget {
   final Widget body;
 
   const AppScaffold({super.key, required this.body});
+
+  @override
+  State<AppScaffold> createState() => _AppScaffoldState();
+}
+
+class _AppScaffoldState extends State<AppScaffold> {
+  @override
+  void initState() {
+    super.initState();
+
+    //Guard any routes using AppScaffold from being accessed if the user is not logged in
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (!mounted) return;
+      if (user == null) {
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +30,7 @@ class AppScaffold extends StatelessWidget {
       appBar: buildAppBar(context),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: body,
+        child: widget.body,
       ),
     );
   }

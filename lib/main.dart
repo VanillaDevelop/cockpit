@@ -1,6 +1,7 @@
 import 'package:cockpit/config/configs.dart';
 import 'package:cockpit/config/constants.dart';
 import 'package:cockpit/firebase_options.dart';
+import 'package:cockpit/pages/consciousness.dart';
 import 'package:cockpit/pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -28,27 +29,47 @@ class CockpitApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: appTitle,
-      theme: appTheme,
-      debugShowCheckedModeBanner: false,
-      home: const LoginRedirect(),
-    );
+        title: appTitle,
+        theme: appTheme,
+        debugShowCheckedModeBanner: false,
+        routes: {
+          '/': (context) => const AuthGuard(),
+          '/home': (context) => const HomePage(),
+          '/thoughts': (context) => const ConsciousnessPage(),
+        });
   }
 }
 
-class LoginRedirect extends StatelessWidget {
-  const LoginRedirect({super.key});
+class AuthGuard extends StatefulWidget {
+  const AuthGuard({super.key});
+
+  @override
+  State<AuthGuard> createState() => _AuthGuardState();
+}
+
+class _AuthGuardState extends State<AuthGuard> {
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (!mounted) return;
+      if (user != null) {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return const HomePage();
-        }
-        return const SignInScreen();
-      },
+    return SignInScreen(
+      actions: [
+        AuthStateChangeAction((context, state) {
+          if (state is SignedIn) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/home', (route) => false);
+          }
+        }),
+      ],
     );
   }
 }

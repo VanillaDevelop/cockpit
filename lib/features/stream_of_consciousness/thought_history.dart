@@ -60,7 +60,9 @@ class ThoughtHistoryState extends State<ThoughtHistory> {
                     ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, '/thoughts');
+                },
                 icon: const Icon(Icons.list_alt),
                 tooltip: 'View History',
               ),

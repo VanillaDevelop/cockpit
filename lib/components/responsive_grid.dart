@@ -5,12 +5,18 @@ class ResponsiveGrid extends StatelessWidget {
   final List<Widget> children;
   final double tabletBreakpoint;
   final double desktopBreakpoint;
+  final int mobileColumns;
+  final int tabletColumns;
+  final int desktopColumns;
 
   const ResponsiveGrid({
     super.key,
     required this.children,
     this.tabletBreakpoint = 768,
     this.desktopBreakpoint = 1024,
+    this.mobileColumns = 1,
+    this.tabletColumns = 2,
+    this.desktopColumns = 3,
   });
 
   @override
@@ -21,11 +27,11 @@ class ResponsiveGrid extends StatelessWidget {
 
         final int columns;
         if (maxWidth < tabletBreakpoint) {
-          columns = 1;
+          columns = mobileColumns;
         } else if (maxWidth < desktopBreakpoint) {
-          columns = 2;
+          columns = tabletColumns;
         } else {
-          columns = 3;
+          columns = desktopColumns;
         }
 
         return AlignedGridView.count(
