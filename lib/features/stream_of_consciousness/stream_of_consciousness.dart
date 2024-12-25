@@ -19,8 +19,7 @@ class _StreamOfConsciousnessState extends State<StreamOfConsciousness> {
   void initState() {
     super.initState();
 
-    getThoughts().then((thoughts) {
-      thoughts = _cleanAndSortThoughts(thoughts);
+    getThoughts(limit: 3).then((thoughts) {
       for (int i = thoughts.length - 1; i >= 0; i--) {
         _thoughtHistoryKey.currentState?.addThought(thoughts[i]);
       }
@@ -36,12 +35,6 @@ class _StreamOfConsciousnessState extends State<StreamOfConsciousness> {
         ThoughtInput(onThoughtAdded: _onThoughtAdded),
       ],
     );
-  }
-
-  List<Thought> _cleanAndSortThoughts(List<Thought> thoughts) {
-    thoughts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    thoughts = thoughts.length < 3 ? thoughts : thoughts.sublist(0, 3);
-    return thoughts;
   }
 
   void _onThoughtAdded(Thought thought) {

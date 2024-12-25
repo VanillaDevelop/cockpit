@@ -5,13 +5,29 @@ import 'package:firebase_auth/firebase_auth.dart';
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
-Future<List<Thought>> getThoughts() async {
+Future<List<Thought>> getThoughts(
+    {int limit = 0, ThoughtType? type, DateTime? olderThan}) async {
   final userId = getUser().uid;
-  final thoughts = await _firestore
+  var query = _firestore
       .collection('users')
       .doc(userId)
       .collection('thoughts')
-      .get();
+      .orderBy('createdAt', descending: true);
+
+  if (type != null) {
+    query = query.where('type', isEqualTo: type.name);
+  }
+
+  if (olderThan != null) {
+    query = query.where('createdAt', isLessThan: olderThan);
+  }
+
+  if (limit > 0) {
+    query = query.limit(limit);
+  }
+
+  final thoughts = await query.get();
+
   return thoughts.docs.map((doc) => Thought.fromJson(doc.data())).toList();
 }
 

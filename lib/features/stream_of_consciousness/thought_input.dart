@@ -2,6 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:cockpit/models/thought.dart';
 import 'package:cockpit/utils/firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ThoughtInput extends StatefulWidget {
   final Function(Thought) onThoughtAdded;
@@ -22,12 +23,25 @@ class _ThoughtInputState extends State<ThoughtInput> {
     _textController.addListener(() {
       setState(() {});
     });
+
+    HardwareKeyboard.instance.addHandler(_handleKeyPress);
   }
 
   @override
   void dispose() {
+    HardwareKeyboard.instance.removeHandler(_handleKeyPress);
     _textController.dispose();
     super.dispose();
+  }
+
+  bool _handleKeyPress(KeyEvent event) {
+    if (event.logicalKey == LogicalKeyboardKey.enter &&
+        !HardwareKeyboard.instance.isShiftPressed &&
+        !_isLoading) {
+      sendThought(_textController.text);
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -38,6 +52,9 @@ class _ThoughtInputState extends State<ThoughtInput> {
           padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: TextField(
             controller: _textController,
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.multiline,
+            onSubmitted: null,
             decoration: InputDecoration(
               enabledBorder: buildTextBoxBorder(),
               focusedBorder: buildTextBoxBorder(),
