@@ -4,11 +4,40 @@ import 'package:intl/intl.dart';
 
 class ThoughtCard extends StatelessWidget {
   final Thought thought;
+  final bool draggable;
 
-  const ThoughtCard({super.key, required this.thought});
+  const ThoughtCard({
+    required this.thought,
+    this.draggable = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    Widget card = buildThoughtCard(context);
+
+    if (draggable) {
+      return Draggable<Thought>(
+        data: thought,
+        feedback: SizedBox(
+          width: 400,
+          height: 105,
+          child: Material(
+            color: Colors.transparent,
+            child: card,
+          ),
+        ),
+        childWhenDragging: Opacity(
+          opacity: 0.5,
+          child: card,
+        ),
+        child: card,
+      );
+    }
+
+    return card;
+  }
+
+  Card buildThoughtCard(BuildContext context) {
     return Card(
       color: Theme.of(context).secondaryHeaderColor,
       child: Padding(

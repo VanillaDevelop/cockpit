@@ -27,7 +27,6 @@ Future<List<Thought>> getThoughts(
   }
 
   final thoughts = await query.get();
-
   return thoughts.docs.map((doc) => Thought.fromJson(doc.data())).toList();
 }
 
