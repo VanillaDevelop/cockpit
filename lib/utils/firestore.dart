@@ -27,7 +27,9 @@ Future<List<Thought>> getThoughts(
   }
 
   final thoughts = await query.get();
-  return thoughts.docs.map((doc) => Thought.fromJson(doc.data())).toList();
+  return thoughts.docs
+      .map((doc) => Thought.fromJson(doc.id, doc.data()))
+      .toList();
 }
 
 Future<bool> addThought(Thought thought) async {
@@ -37,6 +39,19 @@ Future<bool> addThought(Thought thought) async {
       .doc(userId)
       .collection('thoughts')
       .add(thought.toJson())
+      .then((value) => true)
+      .catchError((error) => false);
+  return success;
+}
+
+Future<bool> updateThought(Thought thought) async {
+  final userId = getUser().uid;
+  bool success = await _firestore
+      .collection('users')
+      .doc(userId)
+      .collection('thoughts')
+      .doc(thought.id)
+      .update(thought.toJson())
       .then((value) => true)
       .catchError((error) => false);
   return success;

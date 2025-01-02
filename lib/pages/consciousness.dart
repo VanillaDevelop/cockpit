@@ -24,11 +24,13 @@ class _ConsciousnessPageState extends State<ConsciousnessPage> {
     super.initState();
     //We eagerly load up to 10 uncategorized thoughts and actionable thoughts
     getThoughts(limit: 10, type: ThoughtType.uncategorized).then((thoughts) {
+      if (!mounted) return;
       setState(() {
         _uncategorizedThoughts = thoughts;
       });
     });
     getThoughts(limit: 10, type: ThoughtType.actionable).then((thoughts) {
+      if (!mounted) return;
       setState(() {
         _actionableThoughts = thoughts;
       });
@@ -74,7 +76,63 @@ class _ConsciousnessPageState extends State<ConsciousnessPage> {
     );
   }
 
-  void onThoughtDropped(Thought thought) {
-    //TODO
+  void onThoughtDropped(Thought thought, ThoughtType thoughtType) async {
+    if (thought.type == thoughtType) return;
+
+    ThoughtType oldType = thought.type;
+    thought.type = thoughtType;
+
+    bool success = await updateThought(thought);
+    if (!mounted) return;
+
+    if (success) {
+      setState(() {
+        switch (oldType) {
+          case ThoughtType.uncategorized:
+            _uncategorizedThoughts.remove(thought);
+            _uncategorizedThoughts
+                .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            break;
+          case ThoughtType.actionable:
+            _actionableThoughts.remove(thought);
+            _actionableThoughts
+                .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            break;
+          case ThoughtType.actioned:
+            _actionedThoughts.remove(thought);
+            _actionedThoughts
+                .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            break;
+          case ThoughtType.fleeting:
+            _fleetingThoughts.remove(thought);
+            _fleetingThoughts
+                .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            break;
+        }
+
+        switch (thoughtType) {
+          case ThoughtType.uncategorized:
+            _uncategorizedThoughts.add(thought);
+            _uncategorizedThoughts
+                .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            break;
+          case ThoughtType.actionable:
+            _actionableThoughts.add(thought);
+            _actionableThoughts
+                .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            break;
+          case ThoughtType.actioned:
+            _actionedThoughts.add(thought);
+            _actionedThoughts
+                .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            break;
+          case ThoughtType.fleeting:
+            _fleetingThoughts.add(thought);
+            _fleetingThoughts
+                .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            break;
+        }
+      });
+    }
   }
 }

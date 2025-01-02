@@ -6,16 +6,19 @@ enum ThoughtType {
 }
 
 class Thought {
+  final String? id;
   final String content;
   final DateTime createdAt;
-  final ThoughtType type;
+  ThoughtType type;
 
   Thought({
+    this.id,
     required this.content,
     required this.createdAt,
   }) : type = ThoughtType.uncategorized;
 
   Thought._categorized({
+    required this.id,
     required this.content,
     required this.createdAt,
     required this.type,
@@ -30,8 +33,9 @@ class Thought {
   @override
   int get hashCode => createdAt.hashCode;
 
-  factory Thought.fromJson(Map<String, dynamic> json) {
+  factory Thought.fromJson(String id, Map<String, dynamic> json) {
     return Thought._categorized(
+      id: id,
       content: json['content'],
       createdAt: DateTime.parse(json['createdAt']),
       type: ThoughtType.values.firstWhere(

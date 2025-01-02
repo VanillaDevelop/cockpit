@@ -7,6 +7,7 @@ class ThoughtCard extends StatelessWidget {
   final bool draggable;
 
   const ThoughtCard({
+    super.key,
     required this.thought,
     this.draggable = false,
   });
