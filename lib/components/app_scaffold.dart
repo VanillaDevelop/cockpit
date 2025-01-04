@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 
 class AppScaffold extends StatefulWidget {
   final Widget body;
+  final bool constrainHeight;
 
-  const AppScaffold({super.key, required this.body});
+  const AppScaffold({
+    super.key,
+    required this.body,
+    this.constrainHeight = false,
+  });
 
   @override
   State<AppScaffold> createState() => _AppScaffoldState();
@@ -30,9 +35,22 @@ class _AppScaffoldState extends State<AppScaffold> {
       appBar: buildAppBar(context),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: widget.body,
+        //On certain screens, we want to constrain the height of the body to the screen height
+        child: widget.constrainHeight
+            ? wrapWithHeightConstraint(widget.body)
+            : widget.body,
       ),
     );
+  }
+
+  // Wraps the child in a SizedBox with a height constraint
+  Widget wrapWithHeightConstraint(Widget child) {
+    return LayoutBuilder(builder: (context, constraints) {
+      return SizedBox(
+        height: constraints.maxHeight,
+        child: child,
+      );
+    });
   }
 
   // Builds the app bar

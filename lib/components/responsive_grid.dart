@@ -8,6 +8,7 @@ class ResponsiveGrid extends StatelessWidget {
   final int mobileColumns;
   final int tabletColumns;
   final int desktopColumns;
+  final bool constrainHeight;
 
   const ResponsiveGrid({
     super.key,
@@ -17,6 +18,7 @@ class ResponsiveGrid extends StatelessWidget {
     this.mobileColumns = 1,
     this.tabletColumns = 2,
     this.desktopColumns = 3,
+    this.constrainHeight = false,
   });
 
   @override
@@ -35,10 +37,16 @@ class ResponsiveGrid extends StatelessWidget {
         }
 
         return AlignedGridView.count(
-          crossAxisCount: columns,
-          itemCount: children.length,
-          itemBuilder: (context, index) => children[index],
-        );
+            shrinkWrap: constrainHeight,
+            crossAxisCount: columns,
+            itemCount: children.length,
+            itemBuilder: (context, index) {
+              final int rows = (children.length / columns).ceil();
+              return SizedBox(
+                height: constrainHeight ? constraints.maxHeight / rows : null,
+                child: children[index],
+              );
+            });
       },
     );
   }

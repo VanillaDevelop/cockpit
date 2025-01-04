@@ -21,17 +21,21 @@ class ThoughtContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DragTarget<Thought>(
+      // Relay drop of thought to parent
       onAcceptWithDetails: (details) {
         onThoughtDropped(details.data, thoughtCategoryContainer.thoughtType);
       },
       builder: (context, candidateData, rejectedData) {
         return Container(
+          // Set min height so that we can still drop thoughts on the container even if it's empty
           constraints: const BoxConstraints(minHeight: 200),
           decoration: BoxDecoration(
+            // Show a grey background if the user is hovering over the container
             color: candidateData.isNotEmpty
                 ? Colors.grey.withOpacity(0.3)
                 : Colors.transparent,
           ),
+          // If the thoughts are not visible, render a placeholder instead that allows the user to load more thoughts
           child: thoughtCategoryContainer.visible
               ? _buildThoughtContainer()
               : _buildHiddenContainer(context),
@@ -40,12 +44,14 @@ class ThoughtContainer extends StatelessWidget {
     );
   }
 
+  // Build the container that displays the thoughts
   Widget _buildThoughtContainer() {
     return ListView.builder(
-      shrinkWrap: true,
       itemCount: thoughtCategoryContainer.thoughts.length,
       itemBuilder: (context, index) => ThoughtCard(
-          thought: thoughtCategoryContainer.thoughts[index], draggable: true),
+        thought: thoughtCategoryContainer.thoughts[index],
+        draggable: true,
+      ),
     );
   }
 

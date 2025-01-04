@@ -33,10 +33,13 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
+      constrainHeight: true,
       body: ResponsiveGrid(
+        constrainHeight: true,
         desktopColumns: 4,
         children: [
           FeatureCard(
+              constrainHeight: true,
               title: 'Uncategorized Thoughts',
               child: ThoughtContainer(
                   thoughtCategoryContainer:
@@ -44,6 +47,7 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
                   onThoughtDropped: onThoughtDropped,
                   onLoadMoreThoughts: loadNextThoughts)),
           FeatureCard(
+              constrainHeight: true,
               title: 'Actionable Thoughts',
               child: ThoughtContainer(
                   thoughtCategoryContainer:
@@ -52,6 +56,7 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
                   onLoadMoreThoughts: loadNextThoughts)),
           FeatureCard(
             title: 'Actioned Thoughts',
+            constrainHeight: true,
             child: ThoughtContainer(
               thoughtCategoryContainer:
                   _thoughtContainers[ThoughtType.actioned]!,
@@ -61,6 +66,7 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
           ),
           FeatureCard(
             title: 'Fleeting Thoughts',
+            constrainHeight: true,
             child: ThoughtContainer(
               thoughtCategoryContainer:
                   _thoughtContainers[ThoughtType.fleeting]!,
