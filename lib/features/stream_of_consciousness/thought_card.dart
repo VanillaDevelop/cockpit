@@ -1,7 +1,8 @@
-import 'package:cockpit/models/thought.dart';
+import 'package:cockpit/models/stream_of_consciousness/thought.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// A card displaying a single thought
 class ThoughtCard extends StatelessWidget {
   final Thought thought;
   final bool draggable;
@@ -15,30 +16,28 @@ class ThoughtCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget card = buildThoughtCard(context);
-
-    if (draggable) {
-      return Draggable<Thought>(
-        data: thought,
-        feedback: SizedBox(
-          width: 400,
-          height: 105,
-          child: Material(
-            color: Colors.transparent,
-            child: card,
-          ),
-        ),
-        childWhenDragging: Opacity(
-          opacity: 0.5,
-          child: card,
-        ),
-        child: card,
-      );
-    }
-
-    return card;
+    return draggable ? buildDraggableWrapper(card) : card;
   }
 
-  Card buildThoughtCard(BuildContext context) {
+  // Wraps the card in a draggable widget
+  Widget buildDraggableWrapper(Widget child) {
+    return Draggable<Thought>(
+      data: thought,
+      feedback: SizedBox(
+        width: 400,
+        height: 105,
+        child: Material(
+          color: Colors.transparent,
+          child: child,
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.5, child: child),
+      child: child,
+    );
+  }
+
+  // Builds the card as it is displayed in a container
+  Widget buildThoughtCard(BuildContext context) {
     return Card(
       color: Theme.of(context).secondaryHeaderColor,
       child: Padding(
@@ -55,6 +54,7 @@ class ThoughtCard extends StatelessWidget {
             const Divider(),
             SizedBox(
               width: double.infinity,
+              // The height is set so that it fits exactly 2 lines. Any remaining text is cut off with ellipsis.
               height:
                   Theme.of(context).textTheme.bodyMedium!.fontSize! * 1.5 * 2,
               child: Text(

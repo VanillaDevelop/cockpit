@@ -1,5 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
-import 'package:cockpit/models/thought.dart';
+import 'package:cockpit/models/stream_of_consciousness/thought.dart';
 import 'package:cockpit/utils/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -102,7 +102,6 @@ class _ThoughtInputState extends State<ThoughtInput> {
 
     final thought = Thought(
       content: thoughtContent,
-      createdAt: DateTime.now(),
     );
 
     bool success = await addThought(thought);

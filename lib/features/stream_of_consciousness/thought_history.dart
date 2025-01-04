@@ -1,9 +1,8 @@
-import 'package:cockpit/models/thought.dart';
+import 'package:cockpit/models/stream_of_consciousness/thought.dart';
 import 'package:flutter/material.dart';
 import 'package:cockpit/features/stream_of_consciousness/thought_card.dart';
 
-// This component is used to display the last 3 thoughts overall, and to take in new input with an animation
-// For the component to re-order thoughts, see thought_container.dart
+// This component is used to display the last 3 thoughts overall, and to take in new input with an animation.
 class ThoughtHistory extends StatefulWidget {
   const ThoughtHistory({
     super.key,
@@ -15,7 +14,7 @@ class ThoughtHistory extends StatefulWidget {
 
 class ThoughtHistoryState extends State<ThoughtHistory> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
-  //This is the list of thoughts that will be displayed in the UI
+  //This is the list of thoughts that is currently being displayed
   final List<Thought> _thoughts = [];
 
   @override

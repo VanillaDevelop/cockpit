@@ -1,43 +1,28 @@
 import 'package:cockpit/features/stream_of_consciousness/thought_card.dart';
-import 'package:cockpit/models/thought.dart';
+import 'package:cockpit/models/stream_of_consciousness/thought.dart';
+import 'package:cockpit/models/stream_of_consciousness/thought_category_container.dart';
+import 'package:cockpit/models/stream_of_consciousness/thought_type.dart';
 import 'package:flutter/material.dart';
 
-//Stateless widget that displays a list of thoughts in a container and allows for a callback when a thought is dropped
-//For the component to display the most recent thoughts, see thought_history.dart
-class ThoughtContainer extends StatefulWidget {
-  final List<Thought> thoughts;
-  final ThoughtType thoughtType;
+//Stateless widget that displays a list of thoughts in a container and provides feedback to its parent
+//when a thought is dropped or when the user wants to load more thoughts
+class ThoughtContainer extends StatelessWidget {
+  final ThoughtCategoryContainer thoughtCategoryContainer;
   final Function(Thought thought, ThoughtType thoughtType) onThoughtDropped;
   final Future<bool> Function(ThoughtType thoughtType) onLoadMoreThoughts;
-  final bool startsOpen;
 
   const ThoughtContainer({
     super.key,
-    required this.thoughts,
-    required this.thoughtType,
+    required this.thoughtCategoryContainer,
     required this.onThoughtDropped,
     required this.onLoadMoreThoughts,
-    required this.startsOpen,
   });
-
-  @override
-  State<ThoughtContainer> createState() => _ThoughtContainerState();
-}
-
-class _ThoughtContainerState extends State<ThoughtContainer> {
-  late bool _isOpen;
-
-  @override
-  void initState() {
-    super.initState();
-    _isOpen = widget.startsOpen;
-  }
 
   @override
   Widget build(BuildContext context) {
     return DragTarget<Thought>(
       onAcceptWithDetails: (details) {
-        widget.onThoughtDropped(details.data, widget.thoughtType);
+        onThoughtDropped(details.data, thoughtCategoryContainer.thoughtType);
       },
       builder: (context, candidateData, rejectedData) {
         return Container(
@@ -47,7 +32,9 @@ class _ThoughtContainerState extends State<ThoughtContainer> {
                 ? Colors.grey.withOpacity(0.3)
                 : Colors.transparent,
           ),
-          child: _isOpen ? _buildThoughtContainer() : _buildClosedContainer(),
+          child: thoughtCategoryContainer.visible
+              ? _buildThoughtContainer()
+              : _buildHiddenContainer(context),
         );
       },
     );
@@ -56,13 +43,13 @@ class _ThoughtContainerState extends State<ThoughtContainer> {
   Widget _buildThoughtContainer() {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: widget.thoughts.length,
-      itemBuilder: (context, index) =>
-          ThoughtCard(thought: widget.thoughts[index], draggable: true),
+      itemCount: thoughtCategoryContainer.thoughts.length,
+      itemBuilder: (context, index) => ThoughtCard(
+          thought: thoughtCategoryContainer.thoughts[index], draggable: true),
     );
   }
 
-  Widget _buildClosedContainer() {
+  Widget _buildHiddenContainer(BuildContext context) {
     return Center(
       child: Column(
         children: [
@@ -79,19 +66,11 @@ class _ThoughtContainerState extends State<ThoughtContainer> {
             color: Theme.of(context).colorScheme.primary,
           ),
           ElevatedButton(
-              onPressed: () => _loadMoreThoughts(),
+              onPressed: () =>
+                  onLoadMoreThoughts(thoughtCategoryContainer.thoughtType),
               child: const Text('Load Thoughts')),
         ],
       ),
     );
-  }
-
-  void _loadMoreThoughts() async {
-    bool success = await widget.onLoadMoreThoughts(widget.thoughtType);
-    if (success) {
-      setState(() {
-        _isOpen = true;
-      });
-    }
   }
 }

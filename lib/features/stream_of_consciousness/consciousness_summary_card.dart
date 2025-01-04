@@ -1,17 +1,20 @@
 import 'package:cockpit/features/stream_of_consciousness/thought_history.dart';
 import 'package:cockpit/features/stream_of_consciousness/thought_input.dart';
-import 'package:cockpit/models/thought.dart';
+import 'package:cockpit/models/stream_of_consciousness/thought.dart';
 import 'package:cockpit/utils/firestore.dart';
 import 'package:flutter/material.dart';
 
-class StreamOfConsciousness extends StatefulWidget {
-  const StreamOfConsciousness({super.key});
+// The summary card for the stream of consciousness feature
+class ConsciousnessSummaryCard extends StatefulWidget {
+  const ConsciousnessSummaryCard({super.key});
 
   @override
-  State<StreamOfConsciousness> createState() => _StreamOfConsciousnessState();
+  State<ConsciousnessSummaryCard> createState() =>
+      _ConsciousnessSummaryCardState();
 }
 
-class _StreamOfConsciousnessState extends State<StreamOfConsciousness> {
+class _ConsciousnessSummaryCardState extends State<ConsciousnessSummaryCard> {
+  // Thought history manages the list of thoughts so that it can handle the animation when a thought is added
   final GlobalKey<ThoughtHistoryState> _thoughtHistoryKey =
       GlobalKey<ThoughtHistoryState>();
 
@@ -19,8 +22,10 @@ class _StreamOfConsciousnessState extends State<StreamOfConsciousness> {
   void initState() {
     super.initState();
 
+    // Load the most recent 3 thoughts
     getThoughts(limit: 3).then((thoughts) {
       if (thoughts == null) return;
+      // Add any existing thoughts to the history in order of creation
       for (int i = thoughts.length - 1; i >= 0; i--) {
         _thoughtHistoryKey.currentState?.addThought(thoughts[i]);
       }
@@ -38,6 +43,7 @@ class _StreamOfConsciousnessState extends State<StreamOfConsciousness> {
     );
   }
 
+  // When the user creates a thought from the input box, we forward it to the history
   void _onThoughtAdded(Thought thought) {
     _thoughtHistoryKey.currentState?.addThought(thought);
   }
