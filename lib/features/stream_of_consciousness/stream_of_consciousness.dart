@@ -20,6 +20,7 @@ class _StreamOfConsciousnessState extends State<StreamOfConsciousness> {
     super.initState();
 
     getThoughts(limit: 3).then((thoughts) {
+      if (thoughts == null) return;
       for (int i = thoughts.length - 1; i >= 0; i--) {
         _thoughtHistoryKey.currentState?.addThought(thoughts[i]);
       }

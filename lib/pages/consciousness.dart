@@ -24,15 +24,16 @@ class _ConsciousnessPageState extends State<ConsciousnessPage> {
     super.initState();
     //We eagerly load up to 10 uncategorized thoughts and actionable thoughts
     getThoughts(limit: 10, type: ThoughtType.uncategorized).then((thoughts) {
+      // Need these wacky mount guards because the .then() is mad jank for some reason
       if (!mounted) return;
       setState(() {
-        _uncategorizedThoughts = thoughts;
+        _uncategorizedThoughts = thoughts ?? [];
       });
     });
     getThoughts(limit: 10, type: ThoughtType.actionable).then((thoughts) {
       if (!mounted) return;
       setState(() {
-        _actionableThoughts = thoughts;
+        _actionableThoughts = thoughts ?? [];
       });
     });
   }
@@ -48,19 +49,25 @@ class _ConsciousnessPageState extends State<ConsciousnessPage> {
               child: ThoughtContainer(
                   thoughts: _uncategorizedThoughts,
                   thoughtType: ThoughtType.uncategorized,
-                  onThoughtDropped: onThoughtDropped)),
+                  onThoughtDropped: onThoughtDropped,
+                  startsOpen: true,
+                  onLoadMoreThoughts: onLoadMoreThoughts)),
           FeatureCard(
               title: 'Actionable Thoughts',
               child: ThoughtContainer(
                   thoughts: _actionableThoughts,
                   thoughtType: ThoughtType.actionable,
-                  onThoughtDropped: onThoughtDropped)),
+                  onThoughtDropped: onThoughtDropped,
+                  startsOpen: true,
+                  onLoadMoreThoughts: onLoadMoreThoughts)),
           FeatureCard(
             title: 'Actioned Thoughts',
             child: ThoughtContainer(
               thoughts: _actionedThoughts,
               thoughtType: ThoughtType.actioned,
               onThoughtDropped: onThoughtDropped,
+              startsOpen: false,
+              onLoadMoreThoughts: onLoadMoreThoughts,
             ),
           ),
           FeatureCard(
@@ -69,11 +76,62 @@ class _ConsciousnessPageState extends State<ConsciousnessPage> {
               thoughts: _fleetingThoughts,
               thoughtType: ThoughtType.fleeting,
               onThoughtDropped: onThoughtDropped,
+              startsOpen: false,
+              onLoadMoreThoughts: onLoadMoreThoughts,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<bool> onLoadMoreThoughts(ThoughtType thoughtType) async {
+    //Get oldest thought in the list and get up to 10 more thoughts before that
+    final Thought? oldestThought;
+    switch (thoughtType) {
+      case ThoughtType.uncategorized:
+        oldestThought = _uncategorizedThoughts.lastOrNull;
+        break;
+      case ThoughtType.actionable:
+        oldestThought = _actionableThoughts.lastOrNull;
+        break;
+      case ThoughtType.actioned:
+        oldestThought = _actionedThoughts.lastOrNull;
+        break;
+      case ThoughtType.fleeting:
+        oldestThought = _fleetingThoughts.lastOrNull;
+        break;
+    }
+
+    List<Thought>? thoughts = await getThoughts(
+        limit: 10, type: thoughtType, olderThan: oldestThought?.createdAt);
+
+    if (thoughts == null) return false;
+
+    setState(() {
+      switch (thoughtType) {
+        case ThoughtType.uncategorized:
+          _uncategorizedThoughts.addAll(thoughts);
+          _uncategorizedThoughts
+              .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+          break;
+        case ThoughtType.actionable:
+          _actionableThoughts.addAll(thoughts);
+          _actionableThoughts
+              .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+          break;
+        case ThoughtType.actioned:
+          _actionedThoughts.addAll(thoughts);
+          _actionedThoughts.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+          break;
+        case ThoughtType.fleeting:
+          _fleetingThoughts.addAll(thoughts);
+          _fleetingThoughts.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+          break;
+      }
+    });
+
+    return true;
   }
 
   void onThoughtDropped(Thought thought, ThoughtType thoughtType) async {
