@@ -1,14 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+// A simple app scaffold that provides a consistent header for the main content
 class AppScaffold extends StatefulWidget {
   final Widget body;
-  final bool constrainHeight;
 
   const AppScaffold({
     super.key,
     required this.body,
-    this.constrainHeight = false,
   });
 
   @override
@@ -35,22 +34,9 @@ class _AppScaffoldState extends State<AppScaffold> {
       appBar: buildAppBar(context),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        //On certain screens, we want to constrain the height of the body to the screen height
-        child: widget.constrainHeight
-            ? wrapWithHeightConstraint(widget.body)
-            : widget.body,
+        child: widget.body,
       ),
     );
-  }
-
-  // Wraps the child in a SizedBox with a height constraint
-  Widget wrapWithHeightConstraint(Widget child) {
-    return LayoutBuilder(builder: (context, constraints) {
-      return SizedBox(
-        height: constraints.maxHeight,
-        child: child,
-      );
-    });
   }
 
   // Builds the app bar
@@ -93,7 +79,7 @@ class _AppScaffoldState extends State<AppScaffold> {
   // Builds the trailing part of the app bar
   Text buildTrailingBar(BuildContext context) {
     return Text(
-      'Logged in as ${FirebaseAuth.instance.currentUser?.displayName ?? 'User'}',
+      'Logged in as ${FirebaseAuth.instance.currentUser?.displayName ?? 'unknown user'}',
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: Theme.of(context).colorScheme.onPrimary,
           ),

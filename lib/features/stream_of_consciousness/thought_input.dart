@@ -1,9 +1,10 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:cockpit/models/stream_of_consciousness/thought.dart';
 import 'package:cockpit/utils/firestore.dart';
+import 'package:cockpit/utils/flutter_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// This component is used to take in new thoughts, create them in Firestore, and pass the created thought to the parent component
 class ThoughtInput extends StatefulWidget {
   final Function(Thought) onThoughtAdded;
 
@@ -35,6 +36,7 @@ class _ThoughtInputState extends State<ThoughtInput> {
   }
 
   bool _handleKeyPress(KeyEvent event) {
+    // If the enter key is pressed, we submit the thought unless the shift key is also pressed.
     if (event.logicalKey == LogicalKeyboardKey.enter &&
         !HardwareKeyboard.instance.isShiftPressed &&
         !_isLoading) {
@@ -47,37 +49,34 @@ class _ThoughtInputState extends State<ThoughtInput> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0),
-          child: TextField(
-            controller: _textController,
-            textInputAction: TextInputAction.newline,
-            keyboardType: TextInputType.multiline,
-            onSubmitted: null,
-            decoration: InputDecoration(
-              enabledBorder: buildTextBoxBorder(),
-              focusedBorder: buildTextBoxBorder(),
-              hintText: 'Enter a new thought...',
-              hintStyle: const TextStyle(
-                color: Colors.black54,
-              ),
+        TextField(
+          controller: _textController,
+          // Handle mobile keyboard input when the enter key is pressed
+          textInputAction: TextInputAction.send,
+          onSubmitted: (_) => sendThought(_textController.text),
+          keyboardType: TextInputType.multiline,
+          decoration: InputDecoration(
+            // Consistent text box border styling
+            enabledBorder: buildTextBoxBorder(),
+            focusedBorder: buildTextBoxBorder(),
+            // Placeholder text
+            hintText: 'Enter a new thought...',
+            hintStyle: const TextStyle(
+              color: Colors.black54,
             ),
-            maxLines: 2,
           ),
+          // Size of the input text box
+          maxLines: 2,
         ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: SizedBox(
-            child: ElevatedButton(
-              onPressed: (_isLoading || _textController.text.isEmpty)
-                  ? null
-                  : () {
-                      sendThought(_textController.text);
-                    },
-              child: const Text('Send Thought'),
-            ),
-          ),
+        const SizedBox(height: 8),
+        ElevatedButton(
+          // Only enable the button if the text is not empty and the loading state is not active
+          onPressed: (_isLoading || _textController.text.isEmpty)
+              ? null
+              : () => sendThought(_textController.text),
+          child: const Text('Send Thought'),
         ),
       ],
     );
@@ -93,47 +92,41 @@ class _ThoughtInputState extends State<ThoughtInput> {
     );
   }
 
+  // Sends the thought to Firestore, updates the UI and passes the thought to the parent component
   void sendThought(String thoughtContent) async {
     if (thoughtContent.isEmpty) return;
+    if (_isLoading) return;
 
     setState(() {
       _isLoading = true;
     });
 
+    // Create the thought object
     final thought = Thought(
       content: thoughtContent,
     );
 
+    // Add the thought to Firestore
     bool success = await addThought(thought);
     if (success) {
+      // Pass the thought to the parent component and clear the text box
       widget.onThoughtAdded(thought);
+      // Clear the text box and reset the loading state
       setState(() {
         _textController.clear();
         _isLoading = false;
       });
-    } else {
-      showError(
-          'An error occurred while trying to save the thought...Please try again later!');
     }
-  }
 
-  void showError(String message) {
-    Flushbar(
-      title: 'Error',
-      message: message,
-      icon: const Icon(
-        Icons.error_outline,
-        color: Colors.red,
-      ),
-      leftBarIndicatorColor: Colors.red,
-      duration: const Duration(seconds: 3),
-      onStatusChanged: (status) {
-        if (status == FlushbarStatus.DISMISSED) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      },
-    ).show(context);
+    // Show an error message if the thought was not saved, re-enable button when dismissed
+    if (!success && mounted) {
+      showError(context,
+          'An error occurred while trying to save the thought...Please try again later!',
+          onDismiss: () {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
   }
 }

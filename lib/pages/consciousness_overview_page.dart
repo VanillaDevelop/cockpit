@@ -6,6 +6,7 @@ import 'package:cockpit/models/stream_of_consciousness/thought.dart';
 import 'package:cockpit/models/stream_of_consciousness/thought_category_container.dart';
 import 'package:cockpit/models/stream_of_consciousness/thought_type.dart';
 import 'package:cockpit/utils/firestore.dart';
+import 'package:cockpit/utils/flutter_utils.dart';
 import 'package:flutter/material.dart';
 
 // The overview page for the stream of consciousness
@@ -33,30 +34,29 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      constrainHeight: true,
       body: ResponsiveGrid(
-        constrainHeight: true,
+        adjustToScreenHeight: true,
         desktopColumns: 4,
+        desktopBreakpoint: 1200,
         children: [
           FeatureCard(
-              constrainHeight: true,
-              title: 'Uncategorized Thoughts',
-              child: ThoughtContainer(
-                  thoughtCategoryContainer:
-                      _thoughtContainers[ThoughtType.uncategorized]!,
-                  onThoughtDropped: onThoughtDropped,
-                  onLoadMoreThoughts: loadNextThoughts)),
+            title: 'Uncategorized Thoughts',
+            child: ThoughtContainer(
+                thoughtCategoryContainer:
+                    _thoughtContainers[ThoughtType.uncategorized]!,
+                onThoughtDropped: onThoughtDropped,
+                onLoadMoreThoughts: loadNextThoughts),
+          ),
           FeatureCard(
-              constrainHeight: true,
-              title: 'Actionable Thoughts',
-              child: ThoughtContainer(
-                  thoughtCategoryContainer:
-                      _thoughtContainers[ThoughtType.actionable]!,
-                  onThoughtDropped: onThoughtDropped,
-                  onLoadMoreThoughts: loadNextThoughts)),
+            title: 'Actionable Thoughts',
+            child: ThoughtContainer(
+                thoughtCategoryContainer:
+                    _thoughtContainers[ThoughtType.actionable]!,
+                onThoughtDropped: onThoughtDropped,
+                onLoadMoreThoughts: loadNextThoughts),
+          ),
           FeatureCard(
             title: 'Actioned Thoughts',
-            constrainHeight: true,
             child: ThoughtContainer(
               thoughtCategoryContainer:
                   _thoughtContainers[ThoughtType.actioned]!,
@@ -66,7 +66,6 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
           ),
           FeatureCard(
             title: 'Fleeting Thoughts',
-            constrainHeight: true,
             child: ThoughtContainer(
               thoughtCategoryContainer:
                   _thoughtContainers[ThoughtType.fleeting]!,
@@ -89,22 +88,24 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
     final DateTime? olderThan =
         _thoughtContainers[thoughtType]!.thoughts.lastOrNull?.createdAt;
 
+    _thoughtContainers[thoughtType]!.loading = true;
     List<Thought>? newThoughts =
         await getThoughts(limit: 10, type: thoughtType, olderThan: olderThan);
-    if (newThoughts == null) {
-      //TODO error when fetching
-      return false;
-    }
 
-    if (!mounted) return true;
-    setState(() {
-      _thoughtContainers[thoughtType]!.visible = true;
-      _thoughtContainers[thoughtType]!.thoughts.addAll(newThoughts);
-      _thoughtContainers[thoughtType]!
-          .thoughts
-          .sort((a, b) => a.createdAt.compareTo(b.createdAt));
-      _thoughtContainers[thoughtType]!.loading = false;
-    });
+    if (newThoughts == null && mounted) {
+      showError(context,
+          'An error occurred while trying to load additional thoughts...Please try again later!');
+      return false;
+    } else if (mounted) {
+      setState(() {
+        _thoughtContainers[thoughtType]!.visible = true;
+        _thoughtContainers[thoughtType]!.thoughts.addAll(newThoughts!);
+        _thoughtContainers[thoughtType]!
+            .thoughts
+            .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        _thoughtContainers[thoughtType]!.loading = false;
+      });
+    }
 
     return true;
   }
@@ -130,7 +131,8 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
             .sort((a, b) => a.createdAt.compareTo(b.createdAt));
       });
     } else if (mounted) {
-      //TODO error when updating
+      showError(context,
+          'An error occurred while trying to update the thought...Please try again later!');
     }
   }
 }

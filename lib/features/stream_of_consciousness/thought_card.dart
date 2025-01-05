@@ -21,44 +21,46 @@ class ThoughtCard extends StatelessWidget {
 
   // Wraps the card in a draggable widget
   Widget buildDraggableWrapper(Widget child) {
-    return Draggable<Thought>(
-      data: thought,
-      feedback: SizedBox(
-        width: 400,
-        height: 105,
-        child: Material(
-          color: Colors.transparent,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Draggable<Thought>(
+          data: thought,
+          feedback: SizedBox(
+            width: constraints.maxWidth,
+            child: child,
+          ),
+          childWhenDragging: Opacity(
+            opacity: 0.5,
+            child: child,
+          ),
           child: child,
-        ),
-      ),
-      childWhenDragging: Opacity(opacity: 0.5, child: child),
-      child: child,
+        );
+      },
     );
   }
 
   // Builds the card as it is displayed in a container
   Widget buildThoughtCard(BuildContext context) {
+    final double cardHeight =
+        Theme.of(context).textTheme.bodyMedium!.fontSize! * 1.5 * 2;
+
     return Card(
       color: Theme.of(context).secondaryHeaderColor,
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                DateFormat('dd.MM.yyyy hh:mm a').format(thought.createdAt),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+            Text(
+              DateFormat('dd.MM.yyyy hh:mm a').format(thought.createdAt),
+              style: Theme.of(context).textTheme.bodySmall,
             ),
             const Divider(),
             SizedBox(
-              width: double.infinity,
-              // The height is set so that it fits exactly 2 lines. Any remaining text is cut off with ellipsis.
-              height:
-                  Theme.of(context).textTheme.bodyMedium!.fontSize! * 1.5 * 2,
+              height: cardHeight,
               child: Text(
                 thought.content,
+                style: Theme.of(context).textTheme.bodyMedium,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),

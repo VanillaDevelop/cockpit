@@ -10,32 +10,35 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const AppScaffold(
-      body: ResponsiveGrid(children: [
-        FeatureCard(
-          title: 'Stream of Consciousness',
-          child: ConsciousnessSummaryCard(),
-        ),
-        FeatureCard(
-          title: 'Tasks',
-          child: Text('Placeholder - Tasks'),
-        ),
-        FeatureCard(
-          title: 'Consumable Tracker',
-          child: Text('Placeholder - Consumable Tracker'),
-        ),
-        FeatureCard(
-          title: 'Air Quality',
-          child: Text('Placeholder - Air Quality'),
-        ),
-        FeatureCard(
-          title: 'Automation Buttons',
-          child: Text('Placeholder - Automation Buttons'),
-        ),
-        FeatureCard(
-          title: 'Finance Tracker',
-          child: Text('Placeholder - Finance Tracker'),
-        ),
-      ]),
+      body: ResponsiveGrid(
+        adjustToScreenHeight: false,
+        children: [
+          FeatureCard(
+            title: 'Stream of Consciousness',
+            child: ConsciousnessSummaryCard(),
+          ),
+          FeatureCard(
+            title: 'Tasks',
+            child: Text('Placeholder - Tasks'),
+          ),
+          FeatureCard(
+            title: 'Consumable Tracker',
+            child: Text('Placeholder - Consumable Tracker'),
+          ),
+          FeatureCard(
+            title: 'Air Quality',
+            child: Text('Placeholder - Air Quality'),
+          ),
+          FeatureCard(
+            title: 'Automation Buttons',
+            child: Text('Placeholder - Automation Buttons'),
+          ),
+          FeatureCard(
+            title: 'Finance Tracker',
+            child: Text('Placeholder - Finance Tracker'),
+          ),
+        ],
+      ),
     );
   }
 }

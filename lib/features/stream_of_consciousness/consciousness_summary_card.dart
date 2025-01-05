@@ -1,4 +1,4 @@
-import 'package:cockpit/features/stream_of_consciousness/thought_history.dart';
+import 'package:cockpit/features/stream_of_consciousness/recent_thoughts.dart';
 import 'package:cockpit/features/stream_of_consciousness/thought_input.dart';
 import 'package:cockpit/models/stream_of_consciousness/thought.dart';
 import 'package:cockpit/utils/firestore.dart';
@@ -15,8 +15,8 @@ class ConsciousnessSummaryCard extends StatefulWidget {
 
 class _ConsciousnessSummaryCardState extends State<ConsciousnessSummaryCard> {
   // Thought history manages the list of thoughts so that it can handle the animation when a thought is added
-  final GlobalKey<ThoughtHistoryState> _thoughtHistoryKey =
-      GlobalKey<ThoughtHistoryState>();
+  final GlobalKey<RecentThoughtsState> _thoughtHistoryKey =
+      GlobalKey<RecentThoughtsState>();
 
   @override
   void initState() {
@@ -37,7 +37,7 @@ class _ConsciousnessSummaryCardState extends State<ConsciousnessSummaryCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ThoughtHistory(key: _thoughtHistoryKey),
+        RecentThoughts(key: _thoughtHistoryKey),
         ThoughtInput(onThoughtAdded: _onThoughtAdded),
       ],
     );
