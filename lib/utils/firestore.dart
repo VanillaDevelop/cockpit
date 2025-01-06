@@ -7,7 +7,7 @@ final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 Future<List<Thought>?> getThoughts(
-    {int limit = 0, ThoughtType? type, DateTime? olderThan}) async {
+    {int limit = 0, ThoughtType? type, Timestamp? olderThan}) async {
   try {
     final userId = getUser().uid;
     var query = _firestore
@@ -21,8 +21,7 @@ Future<List<Thought>?> getThoughts(
     }
 
     if (olderThan != null) {
-      query =
-          query.where('createdAt', isLessThan: Timestamp.fromDate(olderThan));
+      query = query.where('createdAt', isLessThan: olderThan);
     }
 
     if (limit > 0) {

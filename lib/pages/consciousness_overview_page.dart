@@ -8,6 +8,7 @@ import 'package:cockpit/models/stream_of_consciousness/thought_type.dart';
 import 'package:cockpit/utils/firestore.dart';
 import 'package:cockpit/utils/flutter_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // The overview page for the stream of consciousness
 class ConsciousnessOverviewPage extends StatefulWidget {
@@ -89,8 +90,8 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
       _thoughtContainers[thoughtType]!.thoughts.clear();
     }
     //Then we get the oldest thought in the container and load up to 10 more thoughts before that. If the container is empty, we load the most recent 10 thoughts
-    final DateTime? olderThan =
-        _thoughtContainers[thoughtType]!.thoughts.lastOrNull?.createdAt;
+    final Timestamp? olderThan =
+        _thoughtContainers[thoughtType]!.nextPageTimestamp;
 
     List<Thought>? newThoughts =
         await getThoughts(limit: 11, type: thoughtType, olderThan: olderThan);
@@ -105,7 +106,16 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
         // We show the next 10 thoughts and hide the loading indicator
         _thoughtContainers[thoughtType]!.hasNextPage =
             newThoughts!.length == 11;
+        _thoughtContainers[thoughtType]!.nextPageTimestamp =
+            _thoughtContainers[thoughtType]!.hasNextPage
+                ? Timestamp.fromDate(newThoughts[9].createdAt)
+                : null;
         _thoughtContainers[thoughtType]!.visible = true;
+
+        //Remove any thoughts that are already in the container - this might happen if the user moves a thought to a different category and then loads more thoughts
+        newThoughts.removeWhere((thought) =>
+            _thoughtContainers[thoughtType]!.thoughts.contains(thought));
+        //Add and sort thoughts
         _thoughtContainers[thoughtType]!.thoughts.addAll(
             newThoughts.length == 11
                 ? newThoughts.sublist(0, 10)

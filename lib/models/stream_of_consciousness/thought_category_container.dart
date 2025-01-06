@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cockpit/models/stream_of_consciousness/thought.dart';
 import 'package:cockpit/models/stream_of_consciousness/thought_type.dart';
 
@@ -9,6 +10,7 @@ class ThoughtCategoryContainer {
   bool visible;
   bool loading;
   bool hasNextPage;
+  Timestamp? nextPageTimestamp;
 
   // Default constructor
   ThoughtCategoryContainer(
