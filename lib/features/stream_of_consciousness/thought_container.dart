@@ -37,7 +37,7 @@ class ThoughtContainer extends StatelessWidget {
             ),
             // If the thoughts are not visible, render a placeholder instead that allows the user to load more thoughts
             child: thoughtCategoryContainer.visible
-                ? _buildThoughtContainer()
+                ? _buildThoughtContainer(context)
                 : _buildHiddenContainer(context),
           );
         },
@@ -46,14 +46,50 @@ class ThoughtContainer extends StatelessWidget {
   }
 
   // Build the container that displays the thoughts
-  Widget _buildThoughtContainer() {
+  Widget _buildThoughtContainer(BuildContext context) {
+    if (thoughtCategoryContainer.thoughts.isEmpty) {
+      return Expanded(
+        child: Center(
+          child: Text(
+            'No thoughts in this category',
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
-      itemCount: thoughtCategoryContainer.thoughts.length,
-      itemBuilder: (context, index) => ThoughtCard(
-        thought: thoughtCategoryContainer.thoughts[index],
-        draggable: true,
-      ),
+      itemCount: thoughtCategoryContainer.thoughts.length + 1,
+      itemBuilder: (context, index) {
+        return index == thoughtCategoryContainer.thoughts.length
+            ? _buildLoadMoreSection()
+            : ThoughtCard(
+                thought: thoughtCategoryContainer.thoughts[index],
+                draggable: true,
+              );
+      },
     );
+  }
+
+  Widget _buildLoadMoreSection() {
+    if (thoughtCategoryContainer.loading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (thoughtCategoryContainer.hasNextPage) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+            onPressed: () {
+              onLoadMoreThoughts(thoughtCategoryContainer.thoughtType);
+            },
+            child: const Text('Load more thoughts')),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   // Build the container that notifies the user that the thoughts in this category are hidden

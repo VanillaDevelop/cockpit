@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cockpit/models/stream_of_consciousness/thought_type.dart';
 
 // A single thought as stored in Firestore
@@ -38,7 +39,7 @@ class Thought {
     return Thought._categorized(
       id: id,
       content: json['content'],
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: (json['createdAt'] as Timestamp).toDate(),
       type: ThoughtType.values.firstWhere(
         (e) => e.name == json['type'],
         orElse: () => ThoughtType.uncategorized,
@@ -50,7 +51,7 @@ class Thought {
   Map<String, dynamic> toJson() {
     return {
       'content': content,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
       'type': type.name,
     };
   }

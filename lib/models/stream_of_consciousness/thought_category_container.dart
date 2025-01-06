@@ -8,6 +8,7 @@ class ThoughtCategoryContainer {
   final List<Thought> thoughts;
   bool visible;
   bool loading;
+  bool hasNextPage;
 
   // Default constructor
   ThoughtCategoryContainer(
@@ -15,7 +16,8 @@ class ThoughtCategoryContainer {
     this.thoughts,
     this.visible,
     this.thoughtType,
-  ) : loading = false;
+  )   : loading = false,
+        hasNextPage = true;
 
   // Create default containers for each thought type
   static Map<ThoughtType, ThoughtCategoryContainer> createDefaultContainers() {

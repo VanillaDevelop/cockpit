@@ -21,7 +21,8 @@ Future<List<Thought>?> getThoughts(
     }
 
     if (olderThan != null) {
-      query = query.where('createdAt', isLessThan: olderThan);
+      query =
+          query.where('createdAt', isLessThan: Timestamp.fromDate(olderThan));
     }
 
     if (limit > 0) {

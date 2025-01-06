@@ -80,6 +80,10 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
 
   // Helper function which loads the next 10 thoughts for a category and updates the state
   Future<bool> loadNextThoughts(ThoughtType thoughtType) async {
+    setState(() {
+      _thoughtContainers[thoughtType]!.loading = true;
+    });
+
     //For safety we clear the thoughts if the container is not visible (there should be no loaded thoughts in a hidden container)
     if (!_thoughtContainers[thoughtType]!.visible) {
       _thoughtContainers[thoughtType]!.thoughts.clear();
@@ -88,9 +92,8 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
     final DateTime? olderThan =
         _thoughtContainers[thoughtType]!.thoughts.lastOrNull?.createdAt;
 
-    _thoughtContainers[thoughtType]!.loading = true;
     List<Thought>? newThoughts =
-        await getThoughts(limit: 10, type: thoughtType, olderThan: olderThan);
+        await getThoughts(limit: 11, type: thoughtType, olderThan: olderThan);
 
     if (newThoughts == null && mounted) {
       showError(context,
@@ -98,11 +101,18 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
       return false;
     } else if (mounted) {
       setState(() {
+        // We set the hasNextPage flag to true if we got 11 thoughts, which means there are more thoughts to load
+        // We show the next 10 thoughts and hide the loading indicator
+        _thoughtContainers[thoughtType]!.hasNextPage =
+            newThoughts!.length == 11;
         _thoughtContainers[thoughtType]!.visible = true;
-        _thoughtContainers[thoughtType]!.thoughts.addAll(newThoughts!);
+        _thoughtContainers[thoughtType]!.thoughts.addAll(
+            newThoughts.length == 11
+                ? newThoughts.sublist(0, 10)
+                : newThoughts);
         _thoughtContainers[thoughtType]!
             .thoughts
-            .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            .sort((a, b) => b.createdAt.compareTo(a.createdAt));
         _thoughtContainers[thoughtType]!.loading = false;
       });
     }
@@ -128,7 +138,7 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
         _thoughtContainers[thoughtType]!.thoughts.add(thought);
         _thoughtContainers[thoughtType]!
             .thoughts
-            .sort((a, b) => a.createdAt.compareTo(b.createdAt));
+            .sort((a, b) => b.createdAt.compareTo(a.createdAt));
       });
     } else if (mounted) {
       showError(context,
