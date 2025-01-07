@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cockpit/config/configs.dart';
 import 'package:cockpit/config/constants.dart';
 import 'package:cockpit/firebase_options.dart';
@@ -6,6 +7,7 @@ import 'package:cockpit/pages/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -19,6 +21,16 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseUIAuth.configureProviders(loginProviders);
+
+  // Use emulator if we are in development
+  if (kDebugMode) {
+    try {
+      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+      FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    } catch (e) {
+      print('Failed to use Firestore emulator: $e');
+    }
+  }
 
   runApp(const CockpitApp());
 }

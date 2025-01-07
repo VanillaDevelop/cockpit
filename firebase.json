@@ -1,1 +1,26 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"nya-gg-cockpit","configurations":{"web":"1:1004006315955:web:fca8d84b3812cf13cd1dc6"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "nya-gg-cockpit",
+          "configurations": {
+            "web": "1:1004006315955:web:fca8d84b3812cf13cd1dc6"
+          }
+        }
+      }
+    }
+  },
+  "emulators": {
+    "singleProjectMode": true,
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": true
+    }
+  }
+}

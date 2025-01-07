@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class FeatureCard extends StatelessWidget {
   final Widget child;
   final String title;
+  final List<Widget>? trailing;
 
   const FeatureCard({
     super.key,
     required this.child,
     required this.title,
+    this.trailing,
   });
 
   @override
@@ -19,11 +21,17 @@ class FeatureCard extends StatelessWidget {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.lightBlue,
-                  ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.lightBlue,
+                      ),
+                ),
+                ...trailing ?? [],
+              ],
             ),
             const Divider(),
             child

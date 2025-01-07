@@ -10,6 +10,7 @@ class ThoughtCategoryContainer {
   bool visible;
   bool loading;
   bool hasNextPage;
+  int thoughtCount;
   Timestamp? nextPageTimestamp;
 
   // Default constructor
@@ -19,7 +20,8 @@ class ThoughtCategoryContainer {
     this.visible,
     this.thoughtType,
   )   : loading = false,
-        hasNextPage = true;
+        hasNextPage = true,
+        thoughtCount = 0;
 
   // Create default containers for each thought type
   static Map<ThoughtType, ThoughtCategoryContainer> createDefaultContainers() {

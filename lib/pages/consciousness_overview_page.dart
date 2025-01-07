@@ -1,5 +1,6 @@
 import 'package:cockpit/components/app_scaffold.dart';
 import 'package:cockpit/components/feature_card.dart';
+import 'package:cockpit/components/number_tooltip.dart';
 import 'package:cockpit/components/responsive_grid.dart';
 import 'package:cockpit/features/stream_of_consciousness/thought_container.dart';
 import 'package:cockpit/models/stream_of_consciousness/thought.dart';
@@ -30,6 +31,22 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
     //We eagerly load up to 10 uncategorized thoughts and actionable thoughts
     loadNextThoughts(ThoughtType.uncategorized);
     loadNextThoughts(ThoughtType.actionable);
+    setThoughtCounts();
+  }
+
+  void setThoughtCounts() async {
+    //Set all the thought counts
+    _thoughtContainers[ThoughtType.uncategorized]!.thoughtCount =
+        await getThoughtCount(ThoughtType.uncategorized);
+    _thoughtContainers[ThoughtType.actionable]!.thoughtCount =
+        await getThoughtCount(ThoughtType.actionable);
+    _thoughtContainers[ThoughtType.actioned]!.thoughtCount =
+        await getThoughtCount(ThoughtType.actioned);
+    _thoughtContainers[ThoughtType.fleeting]!.thoughtCount =
+        await getThoughtCount(ThoughtType.fleeting);
+
+    if (!mounted) return;
+    setState(() {});
   }
 
   @override
@@ -42,6 +59,16 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
         children: [
           FeatureCard(
             title: 'Uncategorized Thoughts',
+            trailing: [
+              const SizedBox(width: 8),
+              NumberTooltip(
+                tooltipText:
+                    'You have ${_thoughtContainers[ThoughtType.uncategorized]!.thoughtCount} uncategorized thoughts!',
+                count:
+                    _thoughtContainers[ThoughtType.uncategorized]!.thoughtCount,
+                color: Colors.lightBlue,
+              ),
+            ],
             child: ThoughtContainer(
                 thoughtCategoryContainer:
                     _thoughtContainers[ThoughtType.uncategorized]!,
@@ -50,6 +77,15 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
           ),
           FeatureCard(
             title: 'Actionable Thoughts',
+            trailing: [
+              const SizedBox(width: 8),
+              NumberTooltip(
+                tooltipText:
+                    'You have ${_thoughtContainers[ThoughtType.actionable]!.thoughtCount} actionable thoughts!',
+                count: _thoughtContainers[ThoughtType.actionable]!.thoughtCount,
+                color: Colors.lightBlue,
+              ),
+            ],
             child: ThoughtContainer(
                 thoughtCategoryContainer:
                     _thoughtContainers[ThoughtType.actionable]!,
@@ -58,6 +94,15 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
           ),
           FeatureCard(
             title: 'Actioned Thoughts',
+            trailing: [
+              const SizedBox(width: 8),
+              NumberTooltip(
+                tooltipText:
+                    'You have ${_thoughtContainers[ThoughtType.actioned]!.thoughtCount} actioned thoughts!',
+                count: _thoughtContainers[ThoughtType.actioned]!.thoughtCount,
+                color: Colors.lightBlue,
+              ),
+            ],
             child: ThoughtContainer(
               thoughtCategoryContainer:
                   _thoughtContainers[ThoughtType.actioned]!,
@@ -67,6 +112,15 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
           ),
           FeatureCard(
             title: 'Fleeting Thoughts',
+            trailing: [
+              const SizedBox(width: 8),
+              NumberTooltip(
+                tooltipText:
+                    'You have ${_thoughtContainers[ThoughtType.fleeting]!.thoughtCount} fleeting thoughts!',
+                count: _thoughtContainers[ThoughtType.fleeting]!.thoughtCount,
+                color: Colors.lightBlue,
+              ),
+            ],
             child: ThoughtContainer(
               thoughtCategoryContainer:
                   _thoughtContainers[ThoughtType.fleeting]!,
@@ -145,7 +199,9 @@ class _ConsciousnessOverviewPageState extends State<ConsciousnessOverviewPage> {
     if (success && mounted) {
       setState(() {
         _thoughtContainers[oldType]!.thoughts.remove(thought);
+        _thoughtContainers[oldType]!.thoughtCount -= 1;
         _thoughtContainers[thoughtType]!.thoughts.add(thought);
+        _thoughtContainers[thoughtType]!.thoughtCount += 1;
         _thoughtContainers[thoughtType]!
             .thoughts
             .sort((a, b) => b.createdAt.compareTo(a.createdAt));

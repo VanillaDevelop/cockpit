@@ -6,6 +6,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
+// Returns the number of thoughts in a given category. Returns -1 if the query fails.
+Future<int> getThoughtCount(ThoughtType type) async {
+  final userId = getUser().uid;
+  final count = await _firestore
+      .collection('users')
+      .doc(userId)
+      .collection('thoughts')
+      .where('type', isEqualTo: type.name)
+      .count()
+      .get();
+
+  return count.count ?? -1;
+}
+
 Future<List<Thought>?> getThoughts(
     {int limit = 0, ThoughtType? type, Timestamp? olderThan}) async {
   try {
