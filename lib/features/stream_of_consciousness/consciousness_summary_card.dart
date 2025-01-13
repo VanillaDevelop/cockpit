@@ -45,6 +45,7 @@ class _ConsciousnessSummaryCardState extends State<ConsciousnessSummaryCard> {
 
   // When the user creates a thought from the input box, we forward it to the history
   void _onThoughtAdded(Thought thought) {
-    _thoughtHistoryKey.currentState?.addThought(thought);
+    //In this case we also want to increase the count of uncategorized thoughts
+    _thoughtHistoryKey.currentState?.addThought(thought, addToCount: true);
   }
 }

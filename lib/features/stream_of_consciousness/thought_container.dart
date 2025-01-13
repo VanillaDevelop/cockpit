@@ -48,12 +48,10 @@ class ThoughtContainer extends StatelessWidget {
   // Build the container that displays the thoughts
   Widget _buildThoughtContainer(BuildContext context) {
     if (thoughtCategoryContainer.thoughts.isEmpty) {
-      return Expanded(
-        child: Center(
-          child: Text(
-            'No thoughts in this category',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
+      return Center(
+        child: Text(
+          'No thoughts in this category',
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
       );
     }

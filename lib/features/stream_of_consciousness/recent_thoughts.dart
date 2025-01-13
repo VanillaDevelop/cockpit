@@ -44,7 +44,7 @@ class RecentThoughtsState extends State<RecentThoughts> {
     }
   }
 
-  void addThought(Thought thought) {
+  void addThought(Thought thought, {bool addToCount = false}) {
     //remove the oldest thought if the list already contains 3 thoughts
     if (_thoughts.length == 3) {
       //Remove without an animation, so that we can see the new thought appear
@@ -63,9 +63,11 @@ class RecentThoughtsState extends State<RecentThoughts> {
       duration: const Duration(milliseconds: 600),
     );
 
-    setState(() {
-      _uncategorizedThoughtCount += 1;
-    });
+    if (addToCount) {
+      setState(() {
+        _uncategorizedThoughtCount += 1;
+      });
+    }
   }
 
   @override
